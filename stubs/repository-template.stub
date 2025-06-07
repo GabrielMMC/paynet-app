@@ -1,0 +1,39 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Models\{{ ModelClass }};
+
+class {{ RepositoryClass }}
+{
+    public function findById(string $id): ?{{ ModelClass }}
+    {
+        return {{ ModelClass }}::find($id);
+    }
+
+    public function create(array $data): ?{{ ModelClass }}
+    {
+        return {{ ModelClass }}::create($data);
+    }
+
+    public function list(array $params): LengthAwarePaginator
+    {
+        return {{ ModelClass }}::filterBySearch(
+            'unaccent(LOWER(name)) LIKE unaccent(?) OR LOWER(zip_code) LIKE ?',
+            [strtolower($params['search']), $params['search']]
+        )
+            ->filterByDate($params['date_of'], $params['date_for'])
+            ->paginate(10);
+    }
+
+    public function update(array $data, string $id): bool
+    {
+        ${{ ModelVariable }} = $this->findById($id);
+        return ${{ ModelVariable }}->update($data);
+    }
+
+    public function delete(string $id): bool
+    {
+        return {{ ModelClass }}::find($id)->delete();
+    }
+}
