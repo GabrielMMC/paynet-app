@@ -3,6 +3,7 @@
 namespace App\Apis;
 
 use Illuminate\Http\Response;
+use App\DTOs\CepConsultDTO;
 
 final class ApiViaCep extends BaseApi
 {
@@ -15,12 +16,12 @@ final class ApiViaCep extends BaseApi
         $this->baseUrl = config('viacep.host');
     }
 
-    public function fetchCep(string $cep): array
+    public function fetchCep(string $cep): CepConsultDTO
     {
         $response = $this->get()
             ->expectedResponse(Response::HTTP_OK)
             ->fetch("/ws/$cep/json");
 
-        return $response->json();
+        return CepConsultDTO::fromArray($response->json());
     }
 }

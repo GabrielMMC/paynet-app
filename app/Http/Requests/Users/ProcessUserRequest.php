@@ -20,10 +20,10 @@ class ProcessUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'cpf.required' => 'O CPF é obrigatório.',
-            'cep.required' => 'O CEP é obrigatório.',
+            'cpf.required'   => 'O CPF é obrigatório.',
+            'cep.required'   => 'O CEP é obrigatório.',
             'email.required' => 'O e-mail é obrigatório.',
-            'email.email' => 'O e-mail deve ser válido.',
+            'email.email'    => 'O e-mail deve ser válido.',
         ];
     }
 
