@@ -2,18 +2,19 @@
 
 namespace App\Apis;
 
-use App\Enums\CpfStatusEnum;
+use App\Enums\CpfSituationEnum;
 
 final class ApiMockCpf
 {
     private const STATUSES = [
-        CpfStatusEnum::VALID,
-        CpfStatusEnum::PENDENT,
-        CpfStatusEnum::NEGATIVE
+        CpfSituationEnum::VALID,
+        CpfSituationEnum::PENDENT,
+        CpfSituationEnum::NEGATIVE
     ];
 
-    public function fetchMockCpfStatus(): int
+    public function fetchMockCpfSituation(): CpfSituationEnum
     {
-        return array_rand(self::STATUSES);
+        $randomKey = array_rand(self::STATUSES);
+        return self::STATUSES[$randomKey];
     }
 }
