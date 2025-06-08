@@ -12,8 +12,8 @@ class UserDataResource extends JsonResource
     {
         return [
             'user'              => new UserResource($this),
-            'address'           => new UserAddressResource($this->address),
-            'financial_profile' => new UserFinancialProfileResource($this->financialProfile)
+            'address'           => new UserAddressResource($this->address()->first()),
+            'financial_profile' => new UserFinancialProfileResource($this->financialProfile()->first())
         ];
     }
 }

@@ -1,0 +1,353 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Paynet API",
+        "description": "API para integração com o sistema Paynet",
+        "termsOfService": "https://paynet.com/terms",
+        "contact": {
+            "email": "api@paynet.com"
+        },
+        "license": {
+            "name": "Proprietary",
+            "url": "https://paynet.com/license"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "API Server"
+        }
+    ],
+    "paths": {
+        "/api/v1/users/{cpf}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Busca um usuário pelo CPF",
+                "description": "Retorna os dados completos de um usuário, incluindo endereço e perfil financeiro",
+                "operationId": "findUserByCpf",
+                "parameters": [
+                    {
+                        "name": "cpf",
+                        "in": "path",
+                        "description": "CPF do usuário (com ou sem formatação)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}$",
+                            "example": "123.456.789-09"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados do usuário encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserDataResource"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "CPF inválido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "O CPF fornecido é inválido"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuário de CPF 123.456.789-09 não encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Falha ao buscar por usuário, tente novamente mais tarde"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/process": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Processa um novo usuário",
+                "description": "Cria um novo usuário com os dados fornecidos e inicia a análise de risco",
+                "operationId": "processUser",
+                "requestBody": {
+                    "description": "Dados do usuário para processamento",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProcessUserRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuário processado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validação falhou",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "O CPF fornecido é inválido"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno no processamento",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Falha ao processar usuário, tente novamente mais tarde."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "FindUserRequest": {
+                "properties": {
+                    "message": {
+                        "description": "Deve ser um CPF válido (com ou sem formatação)",
+                        "type": "string",
+                        "example": "123.456.789-09"
+                    },
+                    "errors": {
+                        "properties": {
+                            "cpf": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "example": "O CPF fornecido é inválido"
+                                }
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "ProcessUserRequest": {
+                "required": [
+                    "cpf",
+                    "cep",
+                    "email"
+                ],
+                "properties": {
+                    "cpf": {
+                        "description": "CPF do usuário (formato XXX.XXX.XXX-XX)",
+                        "type": "string",
+                        "example": "123.456.789-09"
+                    },
+                    "cep": {
+                        "description": "CEP do endereço (8 dígitos)",
+                        "type": "string",
+                        "example": "01001000"
+                    },
+                    "email": {
+                        "description": "E-mail válido do usuário",
+                        "type": "string",
+                        "format": "email",
+                        "example": "usuario@example.com"
+                    }
+                },
+                "type": "object"
+            },
+            "UserAddressResource": {
+                "properties": {
+                    "neighborhood": {
+                        "type": "string",
+                        "example": "Centro"
+                    },
+                    "complement": {
+                        "type": "string",
+                        "example": "Apto 101"
+                    },
+                    "state_code": {
+                        "type": "string",
+                        "example": "SP"
+                    },
+                    "street": {
+                        "type": "string",
+                        "example": "Rua Principal"
+                    },
+                    "region": {
+                        "type": "string",
+                        "example": "Sudeste"
+                    },
+                    "siafi": {
+                        "type": "string",
+                        "example": "7107"
+                    },
+                    "state": {
+                        "type": "string",
+                        "example": "São Paulo"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "São Paulo"
+                    },
+                    "ibge": {
+                        "type": "string",
+                        "example": "3550308"
+                    },
+                    "cep": {
+                        "type": "string",
+                        "example": "01001000"
+                    },
+                    "gia": {
+                        "type": "string",
+                        "example": "1004"
+                    },
+                    "ddd": {
+                        "type": "string",
+                        "example": "11"
+                    }
+                },
+                "type": "object"
+            },
+            "UserDataResource": {
+                "properties": {
+                    "user": {
+                        "$ref": "#/components/schemas/UserResource"
+                    },
+                    "address": {
+                        "$ref": "#/components/schemas/UserAddressResource"
+                    },
+                    "financial_profile": {
+                        "$ref": "#/components/schemas/UserFinancialProfileResource"
+                    }
+                },
+                "type": "object"
+            },
+            "UserFinancialProfileResource": {
+                "properties": {
+                    "situation": {
+                        "type": "string",
+                        "example": "Regular"
+                    },
+                    "risk": {
+                        "type": "string",
+                        "example": "Baixo"
+                    }
+                },
+                "type": "object"
+            },
+            "UserResource": {
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "usuario@example.com"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "João Silva"
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "example": "123.456.789-09"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Users",
+            "description": "Operações de usuário"
+        }
+    ]
+}

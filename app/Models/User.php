@@ -40,28 +40,4 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserFinancialProfile::class);
     }
-
-    public function risk(): HasOneThrough
-    {
-        return $this->hasOneThrough(
-            Risk::class,
-            UserFinancialProfile::class,
-            'user_id',
-            'id',
-            'id',
-            'risk_id'
-        );
-    }
-
-    public function situation(): HasOneThrough
-    {
-        return $this->hasOneThrough(
-            Situation::class,
-            UserFinancialProfile::class,
-            'user_id',
-            'id',
-            'id',
-            'situation_id'
-        );
-    }
 }
