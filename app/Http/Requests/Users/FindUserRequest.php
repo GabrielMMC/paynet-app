@@ -4,6 +4,7 @@ namespace App\Http\Requests\Users;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\ValidCpf;
+use App\Traits\Str;
 
 class FindUserRequest extends FormRequest
 {
@@ -25,7 +26,7 @@ class FindUserRequest extends FormRequest
     public function prepareForValidation(): void
     {
         $this->merge([
-            'cpf' => $this->route('cpf')
+            'cpf' => Str::sanitizeToNumber($this->route('cpf'))
         ]);
     }
 }

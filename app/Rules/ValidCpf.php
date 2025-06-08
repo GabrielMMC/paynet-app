@@ -3,6 +3,7 @@
 namespace App\Rules;
 
 use Illuminate\Contracts\Validation\ValidationRule;
+use App\Traits\Str;
 use Closure;
 
 class ValidCpf implements ValidationRule
@@ -29,7 +30,7 @@ class ValidCpf implements ValidationRule
 
     private function sanitize(string $value): string
     {
-        return preg_replace('/\D/', '', $value);
+        return Str::sanitizeToNumber($value);
     }
 
     private function hasValidLength(string $cpf): bool

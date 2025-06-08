@@ -5,6 +5,7 @@ namespace App\Http\Requests\Users;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\ValidCep;
 use App\Rules\ValidCpf;
+use App\Traits\Str;
 
 class ProcessUserRequest extends FormRequest
 {
@@ -32,8 +33,8 @@ class ProcessUserRequest extends FormRequest
         $validated = parent::validated($key, $default);
 
         return [
-            $validated['cpf'],
-            $validated['cep'],
+            Str::sanitizeToNumber($validated['cpf']),
+            Str::sanitizeToNumber($validated['cep']),
             $validated['email']
         ];
     }

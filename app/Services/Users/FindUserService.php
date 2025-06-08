@@ -3,12 +3,14 @@
 namespace App\Services\Users;
 
 use App\Repositories\Users\UserRepository;
+use App\Exceptions\ServiceException;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Response;
 use App\Traits\CacheableUser;
 use App\Models\User;
-use Exception;
 use Throwable;
 
-class FindUserService
+final class FindUserService
 {
     use CacheableUser;
 
@@ -25,13 +27,15 @@ class FindUserService
         try {
             $user = $this->userRepository->findByCpf($cpf);
 
-            if (!$user) throw new Exception("Usuario de CPF $cpf não encontrado.");
+            if (!$user)
+                throw new ServiceException(message: "Usuario de CPF $cpf não encontrado.", code: Response::HTTP_NOT_FOUND);
 
             CacheableUser::cacheUserData($cpf, $user);
 
             return $user;
         } catch (Throwable $th) {
-            throw new Exception($th->getMessage());
+            Log::channel('user')->error($th->getMessage(), $th->getTrace());
+            throw new ServiceException("Falha ao buscar por usuário, tente novamente mais tarde", $th);
         }
     }
 }

@@ -127,6 +127,22 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'service' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/service.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => env('LOG_DAILY_DAYS', 14),
+            'replace_placeholders' => true,
+        ],
+
+        'user' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/user.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => env('LOG_DAILY_DAYS', 14),
+            'replace_placeholders' => true,
+        ],
+
         'viacep' => [
             'driver' => 'daily',
             'path' => storage_path('logs/viacep.log'),

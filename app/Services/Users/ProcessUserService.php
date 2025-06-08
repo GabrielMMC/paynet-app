@@ -4,6 +4,7 @@ namespace App\Services\Users;
 
 use App\Repositories\Users\UserRepository;
 use App\Jobs\ProcessUserRiskAnalysis;
+use App\Exceptions\ServiceException;
 use Illuminate\Support\Facades\Log;
 use App\DTOs\CreateUserPayloadDTO;
 use App\Enums\CpfSituationEnum;
@@ -13,10 +14,9 @@ use App\DTOs\CepConsultDTO;
 use App\Apis\ApiMockCpf;
 use App\Apis\ApiViaCep;
 use App\Models\User;
-use Exception;
 use Throwable;
 
-class ProcessUserService
+final class ProcessUserService
 {
     use CacheableUser;
 
@@ -24,7 +24,7 @@ class ProcessUserService
         private UserRepository $userRepository
     ) {}
 
-    public function processUser(string $cpf, string $cep, string $email): User | array
+    public function processUser(string $cpf, string $cep, string $email): User
     {
         if ($cachedData = CacheableUser::getUserFromCache($cpf)) {
             return $cachedData;
@@ -35,8 +35,8 @@ class ProcessUserService
             $cpfSituation = $this->fetchMockCpfSituation($cpf);
             $cepData = $this->fetchFromCep($cep);
 
-            $payload = $this->mountPayload($cpf, $email, $cepData);
-            $createdUser = $this->userRepository->createWithAddress($payload);
+            $userPayload = $this->mountUserPayload($cpf, $email, $cepData);
+            $createdUser = $this->userRepository->createWithAddress($userPayload);
 
             CacheableUser::cacheUserData($cpf, $createdUser);
             ProcessUserRiskAnalysis::dispatch($cpfSituation, $cepData, $createdUser)
@@ -44,9 +44,8 @@ class ProcessUserService
 
             return $createdUser;
         } catch (Throwable $th) {
-            dd($th);
-            Log::error("User processing failed: " . $th->getMessage());
-            throw new Exception('Falha ao processar usuário, tente novamente mais tarde.');
+            Log::channel('user')->error($th->getMessage(), $th->getTrace());
+            throw new ServiceException('Falha ao processar usuário, tente novamente mais tarde.', $th);
         }
     }
 
@@ -71,7 +70,7 @@ class ProcessUserService
         return explode('@', $email)[0];
     }
 
-    private function mountPayload(string $cpf, string $email, CepConsultDTO $cepData): CreateUserPayloadDTO
+    private function mountUserPayload(string $cpf, string $email, CepConsultDTO $cepData): CreateUserPayloadDTO
     {
         return new CreateUserPayloadDTO(
             name: $this->getNameByEmail($email),
