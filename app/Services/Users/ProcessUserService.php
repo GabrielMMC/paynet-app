@@ -31,8 +31,8 @@ final class ProcessUserService
         }
 
         try {
-            $userData = $this->fetchFromUserData($email);
             $cpfSituation = $this->fetchMockCpfSituation($cpf);
+            $userData = $this->fetchFromUserData($email);
             $cepData = $this->fetchFromCep($cep);
 
             $userPayload = $this->mountUserPayload($cpf, $email, $cepData);
