@@ -9,14 +9,12 @@ class UserResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $data = parent::toArray($request);
-
         return [
-            'email'      => $data['email'],
-            'name'       => $data['name'],
-            'cpf'        => $data['cpf'],
-            'created_at' => $data['created_at'],
-            'updated_at' => $data['updated_at']
+            'email'      => $this->email,
+            'name'       => $this->name,
+            'cpf'        => $this->cpf,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at
         ];
     }
 }

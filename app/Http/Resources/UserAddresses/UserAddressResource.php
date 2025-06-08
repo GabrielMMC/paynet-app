@@ -9,21 +9,19 @@ class UserAddressResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $data = parent::toArray($request);
-
         return [
-            'neighborhood'  => $data['neighborhood'],
-            'complement'    => $data['complement'],
-            'state_code'    => $data['state_code'],
-            'street'        => $data['street'],
-            'region'        => $data['region'],
-            'siafi'         => $data['siafi'],
-            'state'         => $data['state'],
-            'city'          => $data['city'],
-            'ibge'          => $data['ibge'],
-            'cep'           => $data['cep'],
-            'gia'           => $data['gia'],
-            'ddd'           => $data['ddd']
+            'neighborhood'  => $this->neighborhood,
+            'complement'    => $this->complement,
+            'state_code'    => $this->state_code,
+            'street'        => $this->street,
+            'region'        => $this->region,
+            'siafi'         => $this->siafi,
+            'state'         => $this->state,
+            'city'          => $this->city,
+            'ibge'          => $this->ibge,
+            'cep'           => $this->cep,
+            'gia'           => $this->gia,
+            'ddd'           => $this->ddd
         ];
     }
 }

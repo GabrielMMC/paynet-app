@@ -5,12 +5,13 @@ namespace App\Http\Resources\Users;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Request;
 
-class ProcessUserResource extends JsonResource
+class UserFinancialProfileResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
         return [
-            'user' => new UserResource($this)
+            'situation' => $this->situation->description,
+            'risk'      => $this->risk->description
         ];
     }
 }

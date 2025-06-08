@@ -8,18 +8,26 @@ use App\Models\User;
 //FIXME: Lembrar de configurar o arquivo do redis nos containers do docker
 trait CacheableUser
 {
-    public static function getUserFromCache(string $cpf): ?array
+    public static function getUserFromCache(string $cpf): ?User
     {
         $key = self::getUserCacheKey($cpf);
         $data = Redis::get($key);
 
-        return $data ? json_decode($data, true) : null;
+        return $data ? self::fillUser($data) : null;
     }
 
     public static function cacheUserData(string $cpf, User $userPayload): void
     {
         $key = self::getUserCacheKey($cpf);
         Redis::setex($key, self::getCacheTtl(), json_encode($userPayload));
+    }
+
+    private static function fillUser(string $data): User
+    {
+        $user = new User();
+        $user->forceFill(json_decode($data, true));
+
+        return $user;
     }
 
     private static function getUserCacheKey(string $cpf): string

@@ -43,8 +43,9 @@ class ProcessUserService
                 ->onQueue('risk_analysis');
 
             return $createdUser;
-        } catch (Throwable $e) {
-            Log::error("User processing failed: " . $e->getMessage());
+        } catch (Throwable $th) {
+            dd($th);
+            Log::error("User processing failed: " . $th->getMessage());
             throw new Exception('Falha ao processar usuário, tente novamente mais tarde.');
         }
     }
