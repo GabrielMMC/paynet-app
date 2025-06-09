@@ -1,0 +1,57 @@
+# Use a imagem base do PHP 8.3 com FPM
+FROM php:8.3-fpm
+
+# Definir variáveis de ambiente
+ENV DEBIAN_FRONTEND=noninteractive \
+    COMPOSER_ALLOW_SUPERUSER=1
+
+# Instalar dependências do sistema
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    libpq-dev \
+    zip \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalar extensões do PHP necessárias
+RUN docker-php-ext-install \
+    pdo \
+    pdo_pgsql \
+    pgsql \
+    mbstring \
+    exif \
+    pcntl \
+    bcmath \
+    gd \
+    zip
+
+# Instalar o Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Configurar o diretório de trabalho
+WORKDIR /var/www
+
+# Copiar os arquivos do projeto
+COPY . .
+
+# Instalar dependências do Laravel (ignorando scripts para rodar manualmente)
+RUN composer install --no-scripts --no-autoloader \
+    && composer clear-cache
+
+# Gerar autoloader otimizado
+RUN composer dump-autoload --optimize
+
+# Definir permissões
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+
+# Expor a porta 9000 para o FPM
+EXPOSE 9000
+
+# Comando para iniciar o servidor PHP-FPM
+CMD ["php-fpm"]

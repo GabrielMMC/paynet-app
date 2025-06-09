@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'host' => 'https://api.nationalize.io'
+    'host' => env('API_NATIONALIZE_HOST')
 ];

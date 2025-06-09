@@ -1,61 +1,126 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📝 Documentação da API PayNet - Guia de Instalação Local
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 🚀 Subindo a aplicação localmente (sem Docker)
 
-## About Laravel
+```bash
+# 1. Clone o repositório do projeto
+git clone https://github.com/GabrielMMC/paynet-app
+```
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+```bash
+# 2. Instale as dependências do Composer
+composer install
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+```bash
+# 3. Configure o ambiente
+cp .env.example .env  # Crie seu arquivo .env
+nano .env             # Edite as configurações necessárias
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```bash
+# 4. Crie os bancos de dados
+# (Sugestão: paynet_db para desenvolvimento e paynet_tests_db para testes)
+```
 
-## Learning Laravel
+```bash
+# 5. Execute as migrações e seeders
+php artisan migrate --seed               # Para o ambiente de desenvolvimento
+php artisan migrate --seed --env=testing # Para o ambiente de testes
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+# 6. Gere a documentação Swagger/OpenAPI
+php artisan l5-swagger:generate
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+# 7. Inicie o servidor de desenvolvimento
+php artisan serve
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+# 8. Processamento de filas (em outro terminal)
+php artisan queue:work --queue=risk_analysis
+```
 
-## Laravel Sponsors
+```bash
+# 9. Inicie o Horizon para gerenciamento de filas (em outro terminal)
+php artisan horizon
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🔧 Dicas Extras
 
-### Premium Partners
+- ✨ Execute `php artisan key:generate` se for a primeira instalação
+- 🔍 Configure seu `.env` com as credenciais corretas de banco de dados
+- 🧪 Para executar testes: `php artisan test`
+- 📊 Acesse a documentação Swagger em: `http://localhost:8000/api/documentation`
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# 🐳 Configuração do Ambiente Laravel com Docker
 
-## Contributing
+Este guia explica como configurar e executar um projeto Laravel 12 com PHP 8.3 e PostgreSQL usando Docker Compose.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 📋 Pré-requisitos
+- Docker instalado ([Instalação no Ubuntu](#instalando-docker-no-ubuntu))
+- Docker Compose
 
-## Code of Conduct
+## 🚀 Iniciando o Projeto
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# 1. Clone o repositório do projeto
+git clone https://github.com/GabrielMMC/paynet-app
+```
+## 🐳 Subindo containers que formam a rede
 
-## Security Vulnerabilities
+```bash
+# 1. Execute a rede de containers
+docker-compose up --build
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 2. Liste os containers que estão de pé
+docker ps
 
-## License
+# 3. Entre no container da aplicação Laravel
+docker-compose exec -it b98 /bin/bash
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 4. Rode as migrations
+php artisan migrate
+```
+
+```bash
+# 5. Por fim, não se esqueça de configurar o .env apontando para o DB correto configurado nos containers
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=paynet_db
+DB_USERNAME=postgres
+DB_PASSWORD=123456
+```
+
+## 💻 Instalando Docker no Ubuntu
+```bash
+# Remova versões antigas
+sudo apt remove docker docker-engine docker.io containerd runc
+
+# Instale dependências
+sudo apt update
+sudo apt install -y ca-certificates curl gnupg lsb-release
+
+# Adicione a chave GPG
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+# Adicione o repositório
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Instale o Docker
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+# Configure permissões
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+
+# Teste a instalação
+docker run hello-world
+```

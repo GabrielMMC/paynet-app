@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'host' => 'https://viacep.com.br'
+    'host' => env('API_VIA_CEP_HOST')
 ];

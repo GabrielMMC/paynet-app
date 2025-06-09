@@ -5,7 +5,6 @@ namespace App\Traits;
 use Illuminate\Support\Facades\Redis;
 use App\Models\User;
 
-//FIXME: Lembrar de configurar o arquivo do redis nos containers do docker
 trait CacheableUser
 {
     public static function getUserFromCache(string $cpf): ?User

@@ -1,0 +1,138 @@
+version: '3.8'
+
+services:
+  app:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=paynet_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=123456
+      - REDIS_HOST=redis
+      - QUEUE_CONNECTION=redis
+      - API_VIA_CEP_HOST='viacep.com.br'
+      - API_NATIONALIZE_HOST='api.nationalize.io'
+      - HORIZON_METRICS_ENABLED=true
+      - L5_SWAGGER_GENERATE_ALWAYS=true
+      - L5_SWAGGER_CONST_HOST=http://localhost:8000
+    networks:
+      - laravel_network
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    sysctls:
+    - net.ipv4.conf.all.route_localnet=1
+    cap_add:
+    - NET_ADMIN
+
+  webserver:
+    image: nginx:alpine
+    container_name: laravel_webserver
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - laravel_network
+    depends_on:
+      - app
+
+  postgres:
+    image: postgres:15
+    container_name: laravel_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: paynet_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_MULTIPLE_DATABASES: paynet_db,paynet_tests_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init.sh:/docker-entrypoint-initdb.d/init.sh
+    ports:
+      - "5437:5432"
+    networks:
+      - laravel_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: laravel_redis
+    restart: unless-stopped
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - laravel_network
+
+  tests:
+    build: .
+    container_name: laravel_tests
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    environment:
+      - APP_ENV=testing
+      - DB_CONNECTION=pgsql_testing
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=paynet_tests_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=123456
+      - REDIS_HOST=redis
+    command: >
+      sh -c "./wait-for-postgres.sh postgres 5432 -- 
+      php artisan migrate --seed --force &&
+      php artisan test"
+
+  artisan:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_artisan
+    depends_on:
+      - postgres
+      - redis
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    entrypoint: ['php', '/var/www/artisan']
+    networks:
+      - laravel_network
+
+volumes:
+  postgres_data:
+
+networks:
+  laravel_network:
+    driver: bridge
