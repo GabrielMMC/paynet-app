@@ -1,0 +1,59 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Pagination\LengthAwarePaginator;
+use App\Repositories\{{ RepositoryClass }};
+use App\Models\{{ ModelClass }};
+use Exception;
+
+class {{ ServiceClass }}
+{
+    public function __construct(private {{ RepositoryClass }} ${{ modelVariable }}Repository)
+    {
+        $this->{{ modelVariable }}Repository = ${{ modelVariable }}Repository;
+    }
+
+    public function create{{ ModelClass }}(array $data): {{ ModelClass }}
+    {
+        ${{ modelVariable }} = $this->{{ modelVariable }}Repository->create($data);
+
+        if (!${{ modelVariable }}) {
+            throw new Exception("Erro na criação de {{ modelVariable }}");
+        }
+
+        return ${{ modelVariable }};
+    }
+
+    public function list{{ ModelClass }}s(array $searchParams): LengthAwarePaginator
+    {
+        return $this->{{ modelVariable }}Repository->list($searchParams);
+    }
+
+    public function update{{ ModelClass }}(array $data, string $id): bool
+    {
+        $status = $this->{{ modelVariable }}Repository->update($data, $id);
+
+        if (!$status) {
+            throw new Exception("Erro na atualização de {{ modelVariable }}");
+        }
+
+        return $status;
+    }
+
+    public function delete{{ ModelClass }}(string $id): bool
+    {
+        return $this->{{ modelVariable }}Repository->delete($id);
+    }
+
+    public function get{{ ModelClass }}(string $id): {{ ModelClass }}
+    {
+        ${{ modelVariable }} = $this->{{ modelVariable }}Repository->findById($id);
+
+        if (!${{ modelVariable }}) {
+            throw new Exception("Registro não encontrado");
+        }
+
+        return ${{ modelVariable }};
+    }
+}
