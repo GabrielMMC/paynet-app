@@ -4,7 +4,7 @@ namespace App\Apis;
 
 use Illuminate\Http\Response;
 
-final class ApiNationalize extends BaseApi
+class ApiNationalize extends BaseApi
 {
     public function __construct()
     {

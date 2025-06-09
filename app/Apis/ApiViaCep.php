@@ -5,7 +5,7 @@ namespace App\Apis;
 use Illuminate\Http\Response;
 use App\DTOs\CepConsultDTO;
 
-final class ApiViaCep extends BaseApi
+class ApiViaCep extends BaseApi
 {
     protected string $logChannel;
     protected string $baseUrl;

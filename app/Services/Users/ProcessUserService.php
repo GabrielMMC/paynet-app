@@ -16,7 +16,7 @@ use App\Apis\ApiViaCep;
 use App\Models\User;
 use Throwable;
 
-final class ProcessUserService
+class ProcessUserService
 {
     use CacheableUser;
 

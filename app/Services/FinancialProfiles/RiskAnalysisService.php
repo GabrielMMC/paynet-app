@@ -5,7 +5,7 @@ namespace App\Services\FinancialProfiles;
 use App\Enums\CpfSituationEnum;
 use App\Enums\CpfRiskEnum;
 
-final class RiskAnalysisService
+class RiskAnalysisService
 {
     private const HIGH_RISK_STATES = [
         'SP',

@@ -13,9 +13,9 @@ class SituationsSeeder extends Seeder
     public function run(): void
     {
         $situations = [
-            ['description' => 'Limpo'],
-            ['description' => 'Pendente'],
-            ['description' => 'Negativado']
+            ['id' => 1, 'description' => 'Limpo'],
+            ['id' => 2, 'description' => 'Pendente'],
+            ['id' => 3, 'description' => 'Negativado']
         ];
 
         Situation::insert($situations);

@@ -13,9 +13,9 @@ class RisksSeeder extends Seeder
     public function run(): void
     {
         $risks = [
-            ['description' => 'Baixo'],
-            ['description' => 'Médio'],
-            ['description' => 'Alto']
+            ['id' => 1, 'description' => 'Baixo'],
+            ['id' => 2, 'description' => 'Médio'],
+            ['id' => 3, 'description' => 'Alto']
         ];
 
         Risk::insert($risks);

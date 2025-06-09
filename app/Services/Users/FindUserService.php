@@ -10,7 +10,7 @@ use App\Traits\CacheableUser;
 use App\Models\User;
 use Throwable;
 
-final class FindUserService
+class FindUserService
 {
     use CacheableUser;
 

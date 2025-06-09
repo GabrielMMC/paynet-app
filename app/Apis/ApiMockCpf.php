@@ -4,7 +4,7 @@ namespace App\Apis;
 
 use App\Enums\CpfSituationEnum;
 
-final class ApiMockCpf
+class ApiMockCpf
 {
     private const STATUSES = [
         CpfSituationEnum::VALID,
