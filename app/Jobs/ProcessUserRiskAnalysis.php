@@ -33,7 +33,6 @@ class ProcessUserRiskAnalysis implements ShouldQueue
         $state = $this->user->address->state;
         $riskLevel = $riskService->analyze($this->cpfSituation, $state);
 
-
         $riskLevelPayload = $this->mountRiskLevelPayload($this->cpfSituation, $riskLevel, $this->user->id);
         $financialProfile = $this->bindRiskLevelToUser($riskLevelPayload);
         $pdf = $this->generateReportPdf();

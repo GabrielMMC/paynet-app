@@ -40,7 +40,7 @@ class ProcessUserService
 
             CacheableUser::cacheUserData($cpf, $createdUser);
             ProcessUserRiskAnalysis::dispatch($cpfSituation, $cepData, $createdUser)
-                ->onQueue('risk_analysis');
+                ->onQueue('risk-analysis');
 
             return $createdUser;
         } catch (Throwable $th) {
