@@ -18,6 +18,6 @@ class SituationsSeeder extends Seeder
             ['id' => 3, 'description' => 'Negativado']
         ];
 
-        Situation::insert($situations);
+        Situation::insertOrIgnore($situations);
     }
 }

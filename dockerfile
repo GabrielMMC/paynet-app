@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     zip \
     unzip \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Instalar extensões do PHP necessárias
@@ -29,6 +30,18 @@ RUN docker-php-ext-install \
     bcmath \
     gd \
     zip
+
+# Instalar Supervisor
+RUN apt-get update && apt-get install -y supervisor
+
+# Instalar a extensão Redis via PECL
+RUN pecl install redis && docker-php-ext-enable redis
+
+# Criar pasta de logs do Supervisor
+RUN mkdir -p /var/log/supervisor
+
+# Copiar o arquivo de configuração do Supervisor
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Instalar o Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -46,12 +59,9 @@ RUN composer install --no-scripts --no-autoloader \
 # Gerar autoloader otimizado
 RUN composer dump-autoload --optimize
 
-# Definir permissões
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+# Copiar o entrypoint
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Expor a porta 9000 para o FPM
-EXPOSE 9000
-
-# Comando para iniciar o servidor PHP-FPM
-CMD ["php-fpm"]
+# Definir entrypoint
+ENTRYPOINT ["entrypoint.sh"]

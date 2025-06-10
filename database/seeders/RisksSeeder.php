@@ -18,6 +18,6 @@ class RisksSeeder extends Seeder
             ['id' => 3, 'description' => 'Alto']
         ];
 
-        Risk::insert($risks);
+        Risk::insertOrIgnore($risks);
     }
 }

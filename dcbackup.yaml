@@ -112,8 +112,8 @@ services:
       - REDIS_HOST=redis
     command: >
       sh -c "./wait-for-postgres.sh postgres 5432 -- 
-      php artisan migrate --seed --force &&
       php artisan test"
+    entrypoint: /usr/local/bin/entrypoint.sh
 
   artisan:
     build:
